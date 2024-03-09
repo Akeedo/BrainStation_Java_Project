@@ -1,0 +1,64 @@
+<div class="container">
+  <!-- row -->
+  <div class="row tm-mt-big">
+      <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12">
+          <div class="bg-white tm-block">
+              <div class="row">
+                  <div class="col-12">
+                      <h2 class="tm-block-title d-inline-block">User Registration</h2>
+                  </div>
+                  <div class="col-12">
+                    <p-toast></p-toast>
+                    <div *ngIf="emptyUserSave">
+                    <p-messages [(value)]="messages" [enableService]="false" [closable]="true"></p-messages>
+                  </div>
+              </div>
+              </div>
+              <div class="row mt-4 tm-edit-product-row">
+                  <div class="col-xl-7 col-lg-7 col-md-12">
+                    <form action="" #userForm="ngForm">
+                        <div class="input-group mb-3">
+                              <label for="username" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">User
+                                  Name <span class="required-asterisk">*</span>
+                              </label>
+                              <input type="text" [(ngModel)]="modelSvc.user.userName" required minlength="3" maxlength="20" class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7" id="userName" name="username" placeholder="User Name" #username="ngModel" appRedOnEmpty>
+                              <div *ngIf="modelSvc.getValidationMessage('username', userForm)">
+                                <p-message severity="error" text="{{ modelSvc.getValidationMessage('username', userForm) }}"></p-message>
+                              </div>
+                            </div>
+                          <div class="input-group mb-3">
+                              <label for="email" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Email Address <span class="required-asterisk">*</span>
+                              </label>
+                              <input type="email" class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7" [(ngModel)]="modelSvc.user.email" required id="email" name="email" placeholder="Email" #email="ngModel" appRedOnEmpty
+                                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$">
+                                  <div *ngIf="modelSvc.getValidationMessage('email', userForm)">
+                                    <p-message severity="error" text="{{ modelSvc.getValidationMessage('email', userForm) }}"></p-message>
+                                  </div>
+                          </div>
+                          <div class="input-group mb-3">
+                              <label for="stock" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Password <span class="required-asterisk">*</span>
+                              </label>
+                              <input type="password" class="form-control validate col-xl-9 col-lg-8 col-md-7 col-sm-7" [(ngModel)]="modelSvc.user.password" required minlength="8" id="password" name="password" placeholder="Password" #password="ngModel" appRedOnEmpty>
+                              <div *ngIf="modelSvc.getValidationMessage('password', userForm)">
+                                <p-message severity="error" text="{{ modelSvc.getValidationMessage('password', userForm) }}"></p-message>
+                              </div>
+                            </div>
+                          <div class="input-group mb-3">
+                              <div class="ml-auto col-xl-8 col-lg-8 col-md-8 col-sm-7 pl-0">
+                                <button type="submit" 
+                                class="btn" 
+                                [class.btn-primary]="userForm.form.valid" 
+                                [class.btn-secondary]="!userForm.form.valid" 
+                                (click)="onSave(userForm)">
+                            Register
+                        </button>
+                        </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+</div>

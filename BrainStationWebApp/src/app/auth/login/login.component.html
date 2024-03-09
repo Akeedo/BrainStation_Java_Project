@@ -1,0 +1,57 @@
+<div class="container">
+    <div class="row tm-mt-big">
+        <div class="col-12 mx-auto tm-login-col">
+            <div class="bg-white tm-block">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <i class="fas fa-3x fa-tachometer-alt tm-site-icon text-center"></i>
+                        <h2 class="tm-block-title mt-3">Login</h2>
+                    </div>
+                    <p-toast></p-toast>
+                    <div class="col-12 text-center text-danger" *ngIf="errorMessage">
+                        
+                    <div *ngIf="emptyUserLogin">
+                    <p-messages [(value)]="messages" [enableService]="false" [closable]="true"></p-messages>
+
+                    </div>
+                </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <form #loginForm="ngForm" class="tm-login-form">
+                            <div class="input-group">
+                                <label for="email" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Email  <span class="required-asterisk">*</span></label>
+                                <input type="email" class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7" [(ngModel)]="modelSvc.user.email" required id="email" name="email" placeholder="Email" #email="ngModel" appRedOnEmpty
+                                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$">
+                                 <div *ngIf="modelSvc.getValidationMessage('email', loginForm)" class="text-danger">
+                                    <p-message severity="error" text="{{ modelSvc.getValidationMessage('email', loginForm) }}"></p-message>
+                                </div>
+                            </div>
+                            <div class="input-group mt-3">
+                                <label for="password" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Password<span class="required-asterisk">*</span></label>
+                                <input type="password" class="form-control form-control-sm" [(ngModel)]="modelSvc.user.password" required minlength="8" id="password" name="password" placeholder="Password" #password="ngModel" appRedOnEmpty>
+                                <div *ngIf="modelSvc.getValidationMessage('password', loginForm)" class="text-danger">
+                                    <p-message severity="error" text=" {{ modelSvc.getValidationMessage('password', loginForm) }}"></p-message>
+                                </div>
+                            </div>
+                            <div class="input-group mt-3">
+                                <button type="submit" (click)="onSave(loginForm)" class="btn btn-primary d-inline-block mx-auto">Login</button>
+                            </div>
+                            <div class="input-group mt-3">
+                                <p><em>Just put a character to login.</em></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="row tm-mt-big">
+        <div class="col-12 font-weight-light text-center">
+            <p class="d-inline-block tm-bg-black text-white py-2 px-4">
+                Copyright &copy; 2024 UI Solution Dashboard . Created by
+                <a rel="nofollow" href="https://github.com/Akeedo" class="text-white tm-footer-link">Akeed Anjum</a>
+            </p>
+        </div>
+    </footer>
+</div>
