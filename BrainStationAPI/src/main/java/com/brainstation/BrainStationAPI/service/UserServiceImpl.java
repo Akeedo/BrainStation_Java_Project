@@ -2,7 +2,10 @@ package com.brainstation.BrainStationAPI.service;
 
 import com.brainstation.BrainStationAPI.entity.User;
 import com.brainstation.BrainStationAPI.repository.UserRepository;
+import com.brainstation.BrainStationAPI.utility.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Override
     public ResponseEntity createUser(User user) {
         try {
@@ -25,6 +31,39 @@ public class UserServiceImpl implements UserService {
             return new ResponseEntity<>(_user, HttpStatus.CREATED);
         } catch (Exception e) {
             throw (e);
+        }
+    }
+    @Override
+    public ResponseEntity<String> login(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            String jwtToken = jwtUtil.generateToken(email);
+            return ResponseEntity.ok(jwtToken); // Return the JWT token directly upon successful login
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+    }
+    public ResponseEntity<String> verifyJwt(String jwtToken) {
+        if (jwtUtil.validateToken(jwtToken)) {
+            Claims claims = jwtUtil.extractClaims(jwtToken);
+            String email = claims.getSubject();
+            User user = userRepository.findByEmail(email);
+            if (user != null) {
+                return ResponseEntity.ok("Token valid");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalid or expired");
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> refreshJwt(String oldJwtToken) {
+        if (jwtUtil.validateToken(oldJwtToken)) {
+            String newJwtToken = jwtUtil.refreshToken(oldJwtToken);
+            return ResponseEntity.ok(newJwtToken); // Return the new JWT token directly upon successful refresh
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalid or expired. LOGOUT");
         }
     }
 

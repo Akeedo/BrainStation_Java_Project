@@ -1,24 +1,39 @@
 package com.brainstation.BrainStationAPI.utility;
 
 import io.jsonwebtoken.*;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
 public class JwtUtil {
-    private static final String SECRET = "vQQK1OcnbWL8Ob8ZIcRU2Rcy4MA7E3mv44xZomyEeng=";
-    private static final long EXPIRATION_TIME = 864_000_000; // 10 days
-    public static String generateToken(String username) {
+
+    // key generation - openssl rand -base64 32
+    private final String SECRET_KEY = "nxqFxCA6gnCv08LR1/zQ6vt6E5ouNTuQLnaXJ1V28s4=";
+
+    public String generateToken(String email) {
         return Jwts.builder()
-                .setSubject(username)
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))  // 10 hours token validity
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
-    public static String extractUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public Claims extractClaims(String token) {
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+    }
+
+    public String refreshToken(String token) {
+        Claims claims = extractClaims(token);
+        return generateToken(claims.getSubject());
     }
 }
