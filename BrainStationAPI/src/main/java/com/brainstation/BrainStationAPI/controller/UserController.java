@@ -5,10 +5,9 @@ import com.brainstation.BrainStationAPI.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -21,5 +20,20 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user){
         ResponseEntity saveUser = userService.createUser(user);
         return saveUser;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
+        return userService.getUerById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable("id") long id) {
+        return userService.deleteById(id);
     }
 }
