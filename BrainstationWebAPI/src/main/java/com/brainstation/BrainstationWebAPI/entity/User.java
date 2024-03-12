@@ -1,4 +1,4 @@
-package com.brainstation.BrainStationAPI.entity;
+package com.brainstation.BrainstationWebAPI.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
