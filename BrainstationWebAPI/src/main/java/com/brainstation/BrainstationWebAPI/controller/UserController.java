@@ -18,7 +18,7 @@ public class UserController {
 
     //Build Add User REST API
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user){
+    public ResponseEntity<User> createUser(@RequestBody User user) throws InterruptedException {
         ResponseEntity saveUser = userService.createUser(user);
         return saveUser;
     }
