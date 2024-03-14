@@ -11,6 +11,6 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic topic(){
-     return TopicBuilder.name(AppConstant.USER_SAVE).build();
+     return TopicBuilder.name(AppConstant.USER_CRUD).build();
     }
 }
