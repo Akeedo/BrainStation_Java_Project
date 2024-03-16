@@ -7,6 +7,7 @@ import com.brainstation.BrainstationWebAPI.repository.UserRepository;
 import com.brainstation.BrainstationWebAPI.web.response.UserResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -24,6 +25,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private static final String KEY ="USER";
 
     public boolean updateUserMessageForKafka(String user){
         kafkaTemplate.send(AppConstant.USER_CRUD, user);
@@ -42,8 +47,10 @@ public class UserServiceImpl implements UserService {
                     .save(new User(user.getUsername(), user.getEmail(),user.getPassword()));
             Map<String, String> result = Map.of("message", "The user is created");
            UserResponse response = new UserResponse(_user, result);
-            updateUserMessageForKafka(user.getUsername()+ " is created");
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+           User lastUser = userRepository.findTopByOrderByIdDesc();
+           redisTemplate.opsForHash().put(KEY, lastUser.getId().toString(), lastUser);
+           updateUserMessageForKafka(lastUser.getUsername()+ " is created");
+           return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             throw (e);
         }
@@ -66,7 +73,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<User> getUerById(@PathVariable("id") long id) {
         try{
-            Optional<User> userExist = userRepository.findById(id);
+            Optional<User> userExist;
+            User userFromRedis = (User) redisTemplate.opsForHash().get(KEY, id);
+            if(userFromRedis == null){
+                userExist = userRepository.findById(id);
+            } else{
+                userExist = Optional.of(userFromRedis);
+            }
             updateUserMessageForKafka("Get the user of this id= " + String.valueOf(id));
             return userExist.map(user -> new ResponseEntity<>(user, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
         }
@@ -87,9 +100,11 @@ public class UserServiceImpl implements UserService {
                     .map(existingUser -> {
                         existingUser.setUsername(userUpdate.getUsername());
                         existingUser.setEmail(userUpdate.getEmail());
+                        existingUser.setPassword(userUpdate.getPassword());
                         return userRepository.save(existingUser);
                     })
                     .orElseThrow(() -> new RuntimeException("Unexpected error during user update"));
+            redisTemplate.opsForHash().put(KEY, user.getId().toString(), userUpdate);
             updateUserMessageForKafka("Get the user of this id= " + String.valueOf(id));
             return ResponseEntity.ok(user);
         }
