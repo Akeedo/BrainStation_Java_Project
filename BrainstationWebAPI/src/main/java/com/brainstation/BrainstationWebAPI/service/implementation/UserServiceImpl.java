@@ -1,9 +1,10 @@
-package com.brainstation.BrainstationWebAPI.service;
+package com.brainstation.BrainstationWebAPI.service.implementation;
 
 
 import com.brainstation.BrainstationWebAPI.constant.AppConstant;
 import com.brainstation.BrainstationWebAPI.entity.User;
 import com.brainstation.BrainstationWebAPI.repository.UserRepository;
+import com.brainstation.BrainstationWebAPI.service.UserService;
 import com.brainstation.BrainstationWebAPI.web.response.UserResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
