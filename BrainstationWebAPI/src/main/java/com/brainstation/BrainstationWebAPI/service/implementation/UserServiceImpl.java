@@ -13,6 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +33,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private static final String KEY ="USER";
 
     public boolean updateUserMessageForKafka(String user){
@@ -44,6 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity createUser(User user) throws InterruptedException {
         try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             User _user = userRepository
                     .save(new User(user.getUsername(), user.getEmail(),user.getPassword()));
             Map<String, String> result = Map.of("message", "The user is created");
@@ -88,6 +96,16 @@ public class UserServiceImpl implements UserService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    public UserDetailsService userDetailsService(){
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                return (UserDetails) userRepository.findByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            }
+        };
     }
 
     @Override
