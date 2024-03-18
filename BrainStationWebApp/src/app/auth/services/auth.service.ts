@@ -10,7 +10,7 @@ export class AuthService {
 
   constructor(private router: Router, private http: HttpClient) { }
 
-  private apiURL: string = 'http://localhost:8080';
+  private apiURL: string = 'http://localhost:8082/api';
 
   onLogin(user: any): Observable<any>{
     return this.http.post<any>(this.apiURL +'/login', user);

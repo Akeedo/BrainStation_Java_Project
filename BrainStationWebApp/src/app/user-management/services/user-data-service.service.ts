@@ -11,7 +11,7 @@ export class UserDataServiceService {
     private http: HttpClient
   ) { }
 
-  private apiURL: string = 'http://localhost:8080';
+  private apiURL: string = 'http://localhost:8082/api';
 
     
     saveUser(user: any): Observable<any>{
